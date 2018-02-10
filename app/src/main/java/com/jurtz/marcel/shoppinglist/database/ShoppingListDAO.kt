@@ -4,7 +4,7 @@ import android.arch.persistence.room.*
 import com.jurtz.marcel.shoppinglist.model.ShoppingList
 
 @Dao
-interface ShoppingListDAO {
+interface ShoppingListDao {
     @Query("SELECT * FROM shopping_list")
     fun getAll() : List<ShoppingList>
 
