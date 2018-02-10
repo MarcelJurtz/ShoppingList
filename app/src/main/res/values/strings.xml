@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">ShoppingList</string>
+
+    <string name="rv_shopping_lists_placeholder_title">Header</string>
+    <string name="rv_shopping_lists_placeholder_subtitle">Subheader</string>
+    <string name="rv_shopping_list_items_suffix_multiple">Items</string>
+    <string name="rv_shopping_list_items_suffix_single">Item</string>
 </resources>
