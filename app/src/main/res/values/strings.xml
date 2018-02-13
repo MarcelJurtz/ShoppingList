@@ -5,4 +5,7 @@
     <string name="rv_shopping_lists_placeholder_subtitle">Subheader</string>
     <string name="rv_shopping_list_items_suffix_multiple">Items</string>
     <string name="rv_shopping_list_items_suffix_single">Item</string>
+
+    <string name="cmd_add_shopping_list_text">Add</string>
+    <string name="txt_add_shopping_list_hint">New List</string>
 </resources>
