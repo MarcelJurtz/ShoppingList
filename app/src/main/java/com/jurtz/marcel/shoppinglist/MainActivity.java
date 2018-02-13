@@ -1,7 +1,7 @@
 package com.jurtz.marcel.shoppinglist;
 
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -15,6 +15,7 @@ import com.jurtz.marcel.shoppinglist.model.ShoppingListAdapter;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,11 +36,11 @@ public class MainActivity extends AppCompatActivity {
                 String description = txtDescription.getText().toString().trim();
                 if(description != null && description.length() > 0) {
                     ShoppingList list = new ShoppingList();
-                    list.setDescription(txtDescription.getText().toString());
+                    list.description = txtDescription.getText().toString();
                     AppDatabase.getAppDatabase(getApplicationContext()).shoppingListDao().insertList(list);
+                    txtDescription.setText("");
                 }
             }
         });
-
     }
 }

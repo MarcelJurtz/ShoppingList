@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -32,12 +33,12 @@
 
         </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rvShoppingLists"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/llNewShoppingList"
-        android:layout_margin="8dp" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvShoppingLists"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/llNewShoppingList"
+            android:layout_margin="8dp" />
 
     </RelativeLayout>
 
@@ -46,7 +47,7 @@
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_margin="8dp"
-        android:src="@drawable/ic_add_24dp"
+        android:src="@drawable/ic_add_black_24dp"
         android:tint="@color/colorPrimary"
         app:layout_anchorGravity="right|bottom"
         app:layout_anchor="@+id/rvShoppingLists" />
