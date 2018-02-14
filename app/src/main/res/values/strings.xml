@@ -8,4 +8,12 @@
 
     <string name="cmd_add_shopping_list_text">Add</string>
     <string name="txt_add_shopping_list_hint">New List</string>
+    <string name="title_activity_shopping_list">ShoppingListActivity</string>
+
+    <string name="dialog_input_label">Enter Description</string>
+
+    <string name="dialog_title">New Entry</string>
+    <string name="dialog_message">Add new Entry</string>
+    <string name="dialog_positive_button">Save</string>
+    <string name="dialog_negative_button">Cancel</string>
 </resources>

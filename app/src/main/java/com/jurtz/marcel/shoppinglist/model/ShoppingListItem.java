@@ -2,9 +2,18 @@ package com.jurtz.marcel.shoppinglist.model;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 
-@Entity(tableName = "shopping_list_item")
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
+@Entity(
+        tableName = "shopping_list_item",
+        foreignKeys = @ForeignKey(
+                entity = ShoppingList.class,
+                parentColumns = "id",
+                childColumns = "list_id",
+                onDelete=CASCADE))
 public class ShoppingListItem {
 
     /*
@@ -19,7 +28,7 @@ public class ShoppingListItem {
     @ColumnInfo(name = "id")
     public int id;
 
-    @ColumnInfo(name = "listId")
+    @ColumnInfo(name = "list_id")
     public int listId;
 
     @ColumnInfo(name = "description")

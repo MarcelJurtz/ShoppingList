@@ -13,7 +13,13 @@ import java.util.List;
 public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ShoppingListViewHolder> {
 
     private List<ShoppingList> shoppingLists;
+    OnItemClickListener mItemClickListener;
+
     public ShoppingListAdapter(List<ShoppingList> shoppingLists) {
+        this.shoppingLists = shoppingLists;
+    }
+
+    public void setShoppingLists(List<ShoppingList> shoppingLists) {
         this.shoppingLists = shoppingLists;
     }
 
@@ -40,7 +46,15 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         }
     }
 
-    public static class ShoppingListViewHolder extends RecyclerView.ViewHolder {
+    public interface OnItemClickListener {
+        public void onItemClick(View view, int position);
+    }
+
+    public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
+        this.mItemClickListener = mItemClickListener;
+    }
+
+    public class ShoppingListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView header;
         private TextView subHeader;
@@ -48,9 +62,14 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
         public ShoppingListViewHolder(View v) {
             super(v);
-            this.view = view;
             header = v.findViewById(R.id.lblShoppingListRowItemHeader);
             subHeader = v.findViewById(R.id.lblShoppingListRowItemSubheader);
+            v.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            mItemClickListener.onItemClick(v, getAdapterPosition());
         }
 
         public void bindShoppingList(ShoppingList shoppingList) {
@@ -59,13 +78,13 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
                 header.setText(shoppingList.description);
 
                 String suffix = "";
-                int count = shoppingList.items.size();
-                if (count == 1) {
-                    suffix = view.getContext().getResources().getString(R.string.rv_shopping_list_items_suffix_single);
-                } else {
-                    suffix = view.getContext().getResources().getString(R.string.rv_shopping_list_items_suffix_multiple);
-                }
+                int count = shoppingList.itemCount;
 
+                if (count == 1) {
+                    suffix = header.getContext().getResources().getString(R.string.rv_shopping_list_items_suffix_single);
+                } else {
+                    suffix = header.getContext().getResources().getString(R.string.rv_shopping_list_items_suffix_multiple);
+                }
 
                 subHeader.setText(count + " " + suffix);
             }
