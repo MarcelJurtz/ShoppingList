@@ -41,14 +41,8 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(View v, int position) {
                 Intent intent = new Intent(MainActivity.this, ShoppingListActivity.class);
                 intent.putExtra("shoppinglist_id", shoppingLists.get(position).id);
+                intent.putExtra("shoppinglist_description", shoppingLists.get(position).description);
                 startActivity(intent);
-            }
-        });
-
-        shoppingListAdapter.setOnItemLongClickListener(new ShoppingListAdapter.OnItemLongClickListener() {
-            @Override
-            public void onItemLongClick(View view, int position) {
-                deleteShoppingList(position);
             }
         });
 
@@ -109,13 +103,9 @@ public class MainActivity extends AppCompatActivity {
         reloadAdapter();
     }
 
-    private void deleteShoppingList(int position) {
-        ShoppingList list = shoppingLists.get(position);
-        shoppingLists.remove(list);
-        AppDatabase.getAppDatabase(getApplicationContext()).shoppingListDao().deleteList(list);
+    @Override
+    protected void onResume() {
         reloadAdapter();
-        // Snackbar
+        super.onResume();
     }
-
-
 }

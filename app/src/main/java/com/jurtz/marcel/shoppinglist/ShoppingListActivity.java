@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,8 +26,11 @@ import java.util.List;
 public class ShoppingListActivity extends AppCompatActivity {
 
     int shoppingListId;
+    String shoppingListDescription;
     List<ShoppingListItem> shoppingListItems;
     ShoppingListItemAdapter shoppingListItemAdapter;
+    View parentLayout;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +38,13 @@ public class ShoppingListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_shopping_list);
         //getSupportActionBar().hide();
 
+        parentLayout = findViewById(R.id.clShoppingList);
+        toolbar = findViewById(R.id.shoppingListToolbar);
+
         Intent intent = getIntent();
         shoppingListId = intent.getIntExtra("shoppinglist_id", -1);
+        shoppingListDescription = intent.getStringExtra("shoppinglist_description");
+        toolbar.setTitle(shoppingListDescription);
 
         RecyclerView rvShoppingListItems = findViewById(R.id.rvShoppingListItems);
         rvShoppingListItems.setLayoutManager(new LinearLayoutManager(this));
@@ -57,8 +66,6 @@ public class ShoppingListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 loadNewEntryDialog();
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                //        .setAction("Action", null).show();
             }
         });
 
@@ -110,15 +117,31 @@ public class ShoppingListActivity extends AppCompatActivity {
     }
 
     private void removeEntry(int position) {
-        ShoppingListItem item = shoppingListItems.get(position);
+        final ShoppingListItem item = shoppingListItems.get(position);
         shoppingListItems.remove(item);
         AppDatabase.getAppDatabase(getApplicationContext()).shoppingListItemDao().deleteItem(item);
+        reloadAdapter();
 
+        // Show snackbar to restore entry
+        Snackbar.make(parentLayout, getResources().getString(R.string.snackbar_information), Snackbar.LENGTH_LONG).
+                setAction(getResources().getString(R.string.snackbar_restore), new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        shoppingListItems.add(item);
+                        AppDatabase.getAppDatabase(getApplicationContext()).shoppingListItemDao().insertItem(item);
+                        reloadAdapter();
+                    }
+
+                }).show();
+
+    }
+
+    @Override
+    protected void onPause() {
         if(shoppingListItems.size() == 0) {
             AppDatabase.getAppDatabase(getApplicationContext()).shoppingListDao().deleteListById(shoppingListId);
-            finish();
-        } else {
-            reloadAdapter();
         }
+        super.onPause();
     }
 }

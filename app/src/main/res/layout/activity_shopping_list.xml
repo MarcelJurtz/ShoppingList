@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.jurtz.marcel.shoppinglist.ShoppingListActivity">
+    tools:context="com.jurtz.marcel.shoppinglist.ShoppingListActivity"
+    android:id="@+id/clShoppingList">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -12,10 +13,11 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+            android:id="@+id/shoppingListToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
+            app:title="HUHU"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
@@ -24,10 +26,7 @@
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabShoppingListItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_add_black_24dp" />
+        app:srcCompat="@drawable/ic_add_black_24dp"
+        style="@style/CustomFloatingActionButton" />
 
 </android.support.design.widget.CoordinatorLayout>

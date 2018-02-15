@@ -10,10 +10,13 @@
     <string name="txt_add_shopping_list_hint">New List</string>
     <string name="title_activity_shopping_list">ShoppingListActivity</string>
 
-    <string name="dialog_input_label">Enter Description</string>
+    <string name="dialog_input_label">Description</string>
 
     <string name="dialog_title">New Entry</string>
-    <string name="dialog_message">Add new Entry</string>
+    <string name="dialog_message">Add the description for your new item!</string>
     <string name="dialog_positive_button">Save</string>
     <string name="dialog_negative_button">Cancel</string>
+
+    <string name="snackbar_information">Item deleted</string>
+    <string name="snackbar_restore">Undo</string>
 </resources>

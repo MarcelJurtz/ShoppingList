@@ -17,9 +17,12 @@
             android:id="@+id/txtDialogInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/dialog_input_label"
-            android:inputType="textCapWords"
-            android:textColorHint="?attr/colorAccent"/>
+            android:paddingTop="@dimen/dialog_padding_top"
+            android:layout_marginLeft="@dimen/dialog_margin_horizontally"
+            android:layout_marginStart="@dimen/dialog_margin_horizontally"
+            android:layout_marginRight="@dimen/dialog_margin_horizontally"
+            android:layout_marginEnd="@dimen/dialog_margin_horizontally"
+            android:inputType="textCapWords"/>
     </android.support.design.widget.TextInputLayout>
 
 </android.support.constraint.ConstraintLayout>
