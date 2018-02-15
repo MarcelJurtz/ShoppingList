@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.jurtz.marcel.shoppinglist.database.AppDatabase;
+import com.jurtz.marcel.shoppinglist.model.ShoppingList;
 import com.jurtz.marcel.shoppinglist.model.ShoppingListItem;
 import com.jurtz.marcel.shoppinglist.model.ShoppingListItemAdapter;
 
@@ -31,6 +32,7 @@ public class ShoppingListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_list);
+        //getSupportActionBar().hide();
 
         Intent intent = getIntent();
         shoppingListId = intent.getIntExtra("shoppinglist_id", -1);
@@ -43,14 +45,14 @@ public class ShoppingListActivity extends AppCompatActivity {
         shoppingListItemAdapter.SetOnItemClickListener(new ShoppingListItemAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
-
+                removeEntry(position);
             }
         });
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabShoppingListItem);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,6 +61,9 @@ public class ShoppingListActivity extends AppCompatActivity {
                 //        .setAction("Action", null).show();
             }
         });
+
+        reloadAdapter();
+        rvShoppingListItems.setAdapter(shoppingListItemAdapter);
     }
 
     private void reloadAdapter() {
@@ -102,5 +107,18 @@ public class ShoppingListActivity extends AppCompatActivity {
         AppDatabase.getAppDatabase(getApplicationContext()).shoppingListItemDao().insertItem(item);
         shoppingListItems.add(item);
         reloadAdapter();
+    }
+
+    private void removeEntry(int position) {
+        ShoppingListItem item = shoppingListItems.get(position);
+        shoppingListItems.remove(item);
+        AppDatabase.getAppDatabase(getApplicationContext()).shoppingListItemDao().deleteItem(item);
+
+        if(shoppingListItems.size() == 0) {
+            AppDatabase.getAppDatabase(getApplicationContext()).shoppingListDao().deleteListById(shoppingListId);
+            finish();
+        } else {
+            reloadAdapter();
+        }
     }
 }

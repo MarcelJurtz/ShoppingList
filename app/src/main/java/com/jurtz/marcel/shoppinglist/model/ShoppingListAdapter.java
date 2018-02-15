@@ -14,6 +14,8 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
     private List<ShoppingList> shoppingLists;
     OnItemClickListener mItemClickListener;
+    OnItemLongClickListener mItemLongClickListener;
+
 
     public ShoppingListAdapter(List<ShoppingList> shoppingLists) {
         this.shoppingLists = shoppingLists;
@@ -50,11 +52,19 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         public void onItemClick(View view, int position);
     }
 
-    public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
+    public interface OnItemLongClickListener {
+        public void onItemLongClick(View view, int position);
+    }
+
+    public void setOnItemClickListener(final OnItemClickListener mItemClickListener) {
         this.mItemClickListener = mItemClickListener;
     }
 
-    public class ShoppingListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public void setOnItemLongClickListener(final OnItemLongClickListener mItemLongClickListener) {
+        this.mItemLongClickListener = mItemLongClickListener;
+    }
+
+    public class ShoppingListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         private TextView header;
         private TextView subHeader;
@@ -71,6 +81,9 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         public void onClick(View v) {
             mItemClickListener.onItemClick(v, getAdapterPosition());
         }
+
+        @Override
+        public boolean onLongClick(View v) {mItemLongClickListener.onItemLongClick(v, getAdapterPosition()); return true;}
 
         public void bindShoppingList(ShoppingList shoppingList) {
             if(shoppingList != null) {

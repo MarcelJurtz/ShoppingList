@@ -1,19 +1,23 @@
 package com.jurtz.marcel.shoppinglist;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import android.widget.EditText;
 
 import com.jurtz.marcel.shoppinglist.database.AppDatabase;
 import com.jurtz.marcel.shoppinglist.model.ShoppingList;
 import com.jurtz.marcel.shoppinglist.model.ShoppingListAdapter;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,41 +29,39 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        final TextView txtDescription = (TextView) findViewById(R.id.txtAddNewShoppingList);
+        getSupportActionBar().hide();
 
         RecyclerView rvShoppingLists = findViewById(R.id.rvShoppingLists);
         rvShoppingLists.setLayoutManager(new LinearLayoutManager(this));
 
         shoppingLists = new ArrayList<>();
         shoppingListAdapter = new ShoppingListAdapter(shoppingLists);
-        shoppingListAdapter.SetOnItemClickListener(new ShoppingListAdapter.OnItemClickListener() {
+        shoppingListAdapter.setOnItemClickListener(new ShoppingListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
                 Intent intent = new Intent(MainActivity.this, ShoppingListActivity.class);
                 intent.putExtra("shoppinglist_id", shoppingLists.get(position).id);
                 startActivity(intent);
+            }
+        });
 
+        shoppingListAdapter.setOnItemLongClickListener(new ShoppingListAdapter.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(View view, int position) {
+                deleteShoppingList(position);
+            }
+        });
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabShoppingList);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadNewEntryDialog();
             }
         });
 
         reloadAdapter();
         rvShoppingLists.setAdapter(shoppingListAdapter);
-
-        Button cmdAddNewShoppingList = findViewById(R.id.cmdAddNewShoppingList);
-        cmdAddNewShoppingList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String description = txtDescription.getText().toString().trim();
-                if (description != null && description.length() > 0) {
-                    ShoppingList list = new ShoppingList();
-                    list.description = txtDescription.getText().toString();
-                    AppDatabase.getAppDatabase(getApplicationContext()).shoppingListDao().insertList(list);
-                    txtDescription.setText("");
-                    reloadAdapter();
-                }
-            }
-        });
     }
 
     private void reloadAdapter() {
@@ -69,6 +71,50 @@ public class MainActivity extends AppCompatActivity {
         }
         shoppingListAdapter.setShoppingLists(shoppingLists);
         shoppingListAdapter.notifyDataSetChanged();
+    }
+
+    private void loadNewEntryDialog() {
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.input_dialog, null);
+        dialogBuilder.setView(dialogView);
+
+        final EditText txtInput = (EditText) dialogView.findViewById(R.id.txtDialogInput);
+
+        dialogBuilder.setTitle(getResources().getString(R.string.dialog_title));
+        dialogBuilder.setMessage(getResources().getString(R.string.dialog_message));
+        dialogBuilder.setPositiveButton(getResources().getString(R.string.dialog_positive_button), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String input = txtInput.getText().toString().trim();
+                addNewEntry(input);
+            }
+        });
+        dialogBuilder.setNegativeButton(getResources().getString(R.string.dialog_negative_button), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // pass
+            }
+        });
+
+        AlertDialog b = dialogBuilder.create();
+        b.show();
+    }
+
+    private void addNewEntry(String description) {
+        ShoppingList list = new ShoppingList();
+        list.description = description;
+        list.timestampSeconds = (int)(Calendar.getInstance().getTimeInMillis() / 1000);
+        AppDatabase.getAppDatabase(getApplicationContext()).shoppingListDao().insertList(list);
+        shoppingLists.add(list);
+        reloadAdapter();
+    }
+
+    private void deleteShoppingList(int position) {
+        ShoppingList list = shoppingLists.get(position);
+        shoppingLists.remove(list);
+        AppDatabase.getAppDatabase(getApplicationContext()).shoppingListDao().deleteList(list);
+        reloadAdapter();
+        // Snackbar
     }
 
 

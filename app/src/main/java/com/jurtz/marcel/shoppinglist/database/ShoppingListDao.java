@@ -16,6 +16,9 @@ public interface ShoppingListDao {
     @Query("SELECT * FROM shopping_list")
     List<ShoppingList> getAll();
 
+    @Query("DELETE FROM shopping_list WHERE id = :id")
+    void deleteListById(int id);
+
     @Insert()
     void insertList(ShoppingList shoppingList);
 
