@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ShoppingList</string>
+    <string name="app_name">Sist!</string>
     <string name="main_title">Your Lists</string>
 
     <string name="rv_shopping_lists_placeholder_title">Header</string>
