@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Sist!</string>
+    <string name="main_title">Deine Listen</string>
+
+    <string name="rv_shopping_lists_placeholder_title">Header</string>
+    <string name="rv_shopping_lists_placeholder_subtitle">Subheader</string>
+    <string name="rv_shopping_list_items_suffix_multiple">Einträge</string>
+    <string name="rv_shopping_list_items_suffix_single">Eintrag</string>
+
+    <string name="cmd_add_shopping_list_text">Neu</string>
+    <string name="txt_add_shopping_list_hint">Neue Liste</string>
+    <string name="title_activity_shopping_list">ShoppingListActivity</string>
+
+    <string name="dialog_input_label">Beschreibung</string>
+
+    <string name="dialog_title">Neuer Eintrag</string>
+    <string name="dialog_message">Gib deinem neuen Eintrag eine Beschreibung!</string>
+    <string name="dialog_positive_button">Speichern</string>
+    <string name="dialog_negative_button">Abbrechen</string>
+
+    <string name="snackbar_information">Gelöscht</string>
+    <string name="snackbar_restore">Wiederherstellen</string>
+</resources>
