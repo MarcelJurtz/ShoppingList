@@ -3,4 +3,5 @@
 
     <dimen name="dialog_padding_top">10dp</dimen>
     <dimen name="dialog_margin_horizontally">24dp</dimen>
+    <dimen name="imagebutton_padding">8dp</dimen>
 </resources>

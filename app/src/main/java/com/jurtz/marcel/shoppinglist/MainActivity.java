@@ -11,6 +11,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.jurtz.marcel.shoppinglist.database.AppDatabase;
 import com.jurtz.marcel.shoppinglist.model.ShoppingList;
@@ -18,12 +20,16 @@ import com.jurtz.marcel.shoppinglist.model.ShoppingListAdapter;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     List<ShoppingList> shoppingLists;
     ShoppingListAdapter shoppingListAdapter;
+    ImageButton cmdSort;
+    boolean currentlySortedByTimeStamp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +60,41 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        cmdSort = (ImageButton)findViewById(R.id.cmdSortLists);
+        cmdSort.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentlySortedByTimeStamp = !currentlySortedByTimeStamp;
+                reloadAdapter();
+            }
+        });
+
+        currentlySortedByTimeStamp = false;
         reloadAdapter();
         rvShoppingLists.setAdapter(shoppingListAdapter);
     }
 
     private void reloadAdapter() {
         shoppingLists = AppDatabase.getAppDatabase(getApplicationContext()).shoppingListDao().getAll();
+
+        if(currentlySortedByTimeStamp) {
+            Collections.sort(shoppingLists, new Comparator<ShoppingList>() {
+                @Override
+                public int compare(ShoppingList lhs, ShoppingList rhs) {
+                    return lhs.description.compareTo(rhs.description);
+                }
+            });
+        } else {
+            Collections.sort(shoppingLists, new Comparator<ShoppingList>() {
+                @Override
+                public int compare(ShoppingList lhs, ShoppingList rhs) {
+                    Integer left = new Integer(lhs.timestampSeconds);
+                    Integer right = new Integer(rhs.timestampSeconds);
+                    return left.compareTo(right);
+                }
+            });
+        }
+
         for(int i = 0; i < shoppingLists.size(); i++) {
             shoppingLists.get(i).itemCount = AppDatabase.getAppDatabase(getApplicationContext()).shoppingListItemDao().getItemCountForShoppingList(shoppingLists.get(i).id);
         }
