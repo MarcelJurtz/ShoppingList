@@ -1,6 +1,7 @@
 package com.jurtz.marcel.shoppinglist;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
@@ -24,12 +25,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements IListView {
 
-    List<ShoppingList> shoppingLists;
-    ShoppingListAdapter shoppingListAdapter;
     ImageButton cmdSort;
-    boolean currentlySortedByTimeStamp;
+    IListPresenter presenter;
+    RecyclerView rvShoppingLists;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,20 +37,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
 
-        RecyclerView rvShoppingLists = findViewById(R.id.rvShoppingLists);
-        rvShoppingLists.setLayoutManager(new LinearLayoutManager(this));
+        presenter = new MainPresenter(this);
 
-        shoppingLists = new ArrayList<>();
-        shoppingListAdapter = new ShoppingListAdapter(shoppingLists);
-        shoppingListAdapter.setOnItemClickListener(new ShoppingListAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View v, int position) {
-                Intent intent = new Intent(MainActivity.this, ShoppingListActivity.class);
-                intent.putExtra("shoppinglist_id", shoppingLists.get(position).id);
-                intent.putExtra("shoppinglist_description", shoppingLists.get(position).description);
-                startActivity(intent);
-            }
-        });
+        rvShoppingLists = findViewById(R.id.rvShoppingLists);
+        rvShoppingLists.setLayoutManager(new LinearLayoutManager(this));
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabShoppingList);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -64,45 +54,37 @@ public class MainActivity extends AppCompatActivity {
         cmdSort.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                currentlySortedByTimeStamp = !currentlySortedByTimeStamp;
-                reloadAdapter();
+                presenter.onSortButtonClick();
             }
         });
 
-        currentlySortedByTimeStamp = false;
-        reloadAdapter();
-        rvShoppingLists.setAdapter(shoppingListAdapter);
+        presenter.onCreate();
+
     }
 
-    private void reloadAdapter() {
-        shoppingLists = AppDatabase.getAppDatabase(getApplicationContext()).shoppingListDao().getAll();
-
-        if(currentlySortedByTimeStamp) {
-            Collections.sort(shoppingLists, new Comparator<ShoppingList>() {
-                @Override
-                public int compare(ShoppingList lhs, ShoppingList rhs) {
-                    return lhs.description.compareTo(rhs.description);
-                }
-            });
-        } else {
-            Collections.sort(shoppingLists, new Comparator<ShoppingList>() {
-                @Override
-                public int compare(ShoppingList lhs, ShoppingList rhs) {
-                    Integer left = new Integer(lhs.timestampSeconds);
-                    Integer right = new Integer(rhs.timestampSeconds);
-                    return left.compareTo(right);
-                }
-            });
-        }
-
-        for(int i = 0; i < shoppingLists.size(); i++) {
-            shoppingLists.get(i).itemCount = AppDatabase.getAppDatabase(getApplicationContext()).shoppingListItemDao().getItemCountForShoppingList(shoppingLists.get(i).id);
-        }
-        shoppingListAdapter.setShoppingLists(shoppingLists);
-        shoppingListAdapter.notifyDataSetChanged();
+    @Override
+    public void loadIntent(Intent intent) {
+        startActivity(intent);
     }
 
-    private void loadNewEntryDialog() {
+    @Override
+    public void initAdapter(ShoppingListAdapter adapter) {
+        rvShoppingLists.setAdapter(adapter);
+        adapter.setOnItemClickListener(new ShoppingListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                presenter.onShoppingListClick(position);
+            }
+        });
+    }
+
+    @Override
+    public Context getContext() {
+        return getApplicationContext();
+    }
+
+    @Override
+    public void loadNewEntryDialog() {
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
@@ -116,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         dialogBuilder.setPositiveButton(getResources().getString(R.string.dialog_positive_button), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String input = txtInput.getText().toString().trim();
-                addNewEntry(input);
+                presenter.onEntryDialogConfirmation(input);
             }
         });
         dialogBuilder.setNegativeButton(getResources().getString(R.string.dialog_negative_button), new DialogInterface.OnClickListener() {
@@ -129,18 +111,9 @@ public class MainActivity extends AppCompatActivity {
         b.show();
     }
 
-    private void addNewEntry(String description) {
-        ShoppingList list = new ShoppingList();
-        list.description = description;
-        list.timestampSeconds = (int)(Calendar.getInstance().getTimeInMillis() / 1000);
-        AppDatabase.getAppDatabase(getApplicationContext()).shoppingListDao().insertList(list);
-        shoppingLists.add(list);
-        reloadAdapter();
-    }
-
     @Override
     protected void onResume() {
-        reloadAdapter();
+        presenter.onResume();
         super.onResume();
     }
 }
