@@ -11,24 +11,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
-
-import com.jurtz.marcel.shoppinglist.database.AppDatabase;
-import com.jurtz.marcel.shoppinglist.model.ShoppingList;
 import com.jurtz.marcel.shoppinglist.model.ShoppingListAdapter;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-public class MainActivity extends AppCompatActivity implements IListView {
+public class MainActivity extends AppCompatActivity implements IMainView {
 
     ImageButton cmdSort;
-    IListPresenter presenter;
+    IMainPresenter presenter;
     RecyclerView rvShoppingLists;
 
     @Override
@@ -108,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements IListView {
         });
 
         AlertDialog b = dialogBuilder.create();
+        b.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         b.show();
     }
 

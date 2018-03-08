@@ -1,6 +1,7 @@
 package com.jurtz.marcel.shoppinglist;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,10 +13,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 import com.jurtz.marcel.shoppinglist.database.AppDatabase;
 import com.jurtz.marcel.shoppinglist.model.ShoppingList;
+import com.jurtz.marcel.shoppinglist.model.ShoppingListAdapter;
 import com.jurtz.marcel.shoppinglist.model.ShoppingListItem;
 import com.jurtz.marcel.shoppinglist.model.ShoppingListItemAdapter;
 
@@ -23,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class ShoppingListActivity extends AppCompatActivity {
+public class ShoppingListActivity extends AppCompatActivity implements IDetailView {
 
     int shoppingListId;
     String shoppingListDescription;
@@ -31,12 +34,17 @@ public class ShoppingListActivity extends AppCompatActivity {
     ShoppingListItemAdapter shoppingListItemAdapter;
     View parentLayout;
     Toolbar toolbar;
+    RecyclerView rvShoppingListItems;
+
+    IDetailPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_list);
         //getSupportActionBar().hide();
+
+        presenter = new ShoppingListPresenter(this);
 
         parentLayout = findViewById(R.id.clShoppingList);
         toolbar = findViewById(R.id.shoppingListToolbar);
@@ -46,17 +54,8 @@ public class ShoppingListActivity extends AppCompatActivity {
         shoppingListDescription = intent.getStringExtra("shoppinglist_description");
         toolbar.setTitle(shoppingListDescription);
 
-        RecyclerView rvShoppingListItems = findViewById(R.id.rvShoppingListItems);
+        rvShoppingListItems = findViewById(R.id.rvShoppingListItems);
         rvShoppingListItems.setLayoutManager(new LinearLayoutManager(this));
-
-        shoppingListItems = AppDatabase.getAppDatabase(getApplicationContext()).shoppingListItemDao().getAllForShoppingList(shoppingListId);
-        shoppingListItemAdapter = new ShoppingListItemAdapter(shoppingListItems);
-        shoppingListItemAdapter.SetOnItemClickListener(new ShoppingListItemAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View v, int position) {
-                removeEntry(position);
-            }
-        });
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -69,17 +68,35 @@ public class ShoppingListActivity extends AppCompatActivity {
             }
         });
 
-        reloadAdapter();
         rvShoppingListItems.setAdapter(shoppingListItemAdapter);
+
+        presenter.onCreate();
     }
 
-    private void reloadAdapter() {
-        shoppingListItems = AppDatabase.getAppDatabase(getApplicationContext()).shoppingListItemDao().getAllForShoppingList(shoppingListId);
-        shoppingListItemAdapter.setShoppingListItems(shoppingListItems);
-        shoppingListItemAdapter.notifyDataSetChanged();
+
+    @Override
+    public Context getContext() {
+        return getApplicationContext();
     }
 
-    private void loadNewEntryDialog() {
+    @Override
+    public void loadPreviousActivity(Intent intent) {
+
+    }
+
+    @Override
+    public void initAdapter(ShoppingListItemAdapter adapter) {
+        rvShoppingListItems.setAdapter(adapter);
+        adapter.SetOnItemClickListener(new ShoppingListItemAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                removeEntry(position);
+            }
+        });
+    }
+
+    @Override
+    public void loadNewEntryDialog() {
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
@@ -93,7 +110,7 @@ public class ShoppingListActivity extends AppCompatActivity {
         dialogBuilder.setPositiveButton(getResources().getString(R.string.dialog_positive_button), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String input = txtInput.getText().toString().trim();
-                addNewEntry(input);
+                presenter.onEntryDialogConfirmation(input);
             }
         });
         dialogBuilder.setNegativeButton(getResources().getString(R.string.dialog_negative_button), new DialogInterface.OnClickListener() {
@@ -103,37 +120,12 @@ public class ShoppingListActivity extends AppCompatActivity {
         });
 
         AlertDialog b = dialogBuilder.create();
+        b.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         b.show();
     }
 
-    private void addNewEntry(String description) {
-        ShoppingListItem item = new ShoppingListItem();
-        item.description = description;
-        item.timestampSeconds = (int)(Calendar.getInstance().getTimeInMillis() / 1000);
-        item.listId = shoppingListId;
-        AppDatabase.getAppDatabase(getApplicationContext()).shoppingListItemDao().insertItem(item);
-        shoppingListItems.add(item);
-        reloadAdapter();
-    }
-
     private void removeEntry(int position) {
-        final ShoppingListItem item = shoppingListItems.get(position);
-        shoppingListItems.remove(item);
-        AppDatabase.getAppDatabase(getApplicationContext()).shoppingListItemDao().deleteItem(item);
-        reloadAdapter();
 
-        // Show snackbar to restore entry
-        Snackbar.make(parentLayout, getResources().getString(R.string.snackbar_information), Snackbar.LENGTH_LONG).
-                setAction(getResources().getString(R.string.snackbar_restore), new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        shoppingListItems.add(item);
-                        AppDatabase.getAppDatabase(getApplicationContext()).shoppingListItemDao().insertItem(item);
-                        reloadAdapter();
-                    }
-
-                }).show();
 
     }
 

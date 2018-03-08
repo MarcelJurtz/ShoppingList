@@ -1,6 +1,5 @@
 package com.jurtz.marcel.shoppinglist;
 
-import android.content.Context;
 import android.content.Intent;
 
 import com.jurtz.marcel.shoppinglist.database.AppDatabase;
@@ -13,15 +12,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class MainPresenter implements IListPresenter {
+public class MainPresenter implements IMainPresenter {
 
-    private IListView view;
+    private IMainView view;
     List<ShoppingList> shoppingLists;
     boolean currentlySortedByTimeStamp;
     ShoppingListAdapter shoppingListAdapter;
 
 
-    public MainPresenter(IListView view) {
+    public MainPresenter(IMainView view) {
         this.view = view;
         shoppingLists = new ArrayList<>();
         shoppingListAdapter = new ShoppingListAdapter(shoppingLists);

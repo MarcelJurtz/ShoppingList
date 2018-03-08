@@ -8,7 +8,7 @@ import com.jurtz.marcel.shoppinglist.model.ShoppingListAdapter;
 
 import java.util.List;
 
-public interface IListView {
+public interface IMainView {
     Context getContext();
     void loadNewEntryDialog();
     void loadIntent(Intent intent);
