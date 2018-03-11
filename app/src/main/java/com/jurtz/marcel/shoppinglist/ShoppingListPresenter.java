@@ -106,9 +106,4 @@ public class ShoppingListPresenter implements IDetailPresenter {
             AppDatabase.getAppDatabase(view.getContext()).shoppingListDao().deleteListById(shoppingListId);
         }
     }
-
-    @Override
-    public void onAddNewItemButtonClick() {
-        view.loadNewEntryDialog();
-    }
 }

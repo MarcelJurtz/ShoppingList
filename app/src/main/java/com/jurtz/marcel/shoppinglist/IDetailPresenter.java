@@ -4,8 +4,8 @@ import com.jurtz.marcel.shoppinglist.model.ShoppingListItem;
 
 public interface IDetailPresenter {
     void onShoppingListItemClick(int position);
-    void onAddNewItemButtonClick();
-    void onSortButtonClick(); // TODO
+    void onFloatingActionButtonClick();
+    void onSortButtonClick();
     void onEntryDialogConfirmation(String input);
     void onRestoreSnackbarClick(ShoppingListItem item);
     void onCreate();

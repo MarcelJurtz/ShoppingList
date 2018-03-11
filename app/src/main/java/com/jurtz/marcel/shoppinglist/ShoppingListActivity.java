@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.jurtz.marcel.shoppinglist.database.AppDatabase;
 import com.jurtz.marcel.shoppinglist.model.ShoppingList;
@@ -36,6 +37,7 @@ public class ShoppingListActivity extends AppCompatActivity implements IDetailVi
     Toolbar toolbar;
     RecyclerView rvShoppingListItems;
 
+    private ImageButton cmdSort;
     IDetailPresenter presenter;
 
     @Override
@@ -64,7 +66,15 @@ public class ShoppingListActivity extends AppCompatActivity implements IDetailVi
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                presenter.onAddNewItemButtonClick();
+                presenter.onFloatingActionButtonClick();
+            }
+        });
+
+        cmdSort = (ImageButton)findViewById(R.id.cmdSortItems);
+        cmdSort.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onSortButtonClick();
             }
         });
 
