@@ -1,11 +1,6 @@
 package com.jurtz.marcel.shoppinglist;
 
-import android.support.design.widget.Snackbar;
-import android.view.View;
-
 import com.jurtz.marcel.shoppinglist.database.AppDatabase;
-import com.jurtz.marcel.shoppinglist.model.ShoppingList;
-import com.jurtz.marcel.shoppinglist.model.ShoppingListAdapter;
 import com.jurtz.marcel.shoppinglist.model.ShoppingListItem;
 import com.jurtz.marcel.shoppinglist.model.ShoppingListItemAdapter;
 
@@ -18,35 +13,32 @@ import java.util.List;
 public class ShoppingListPresenter implements IDetailPresenter {
 
     private IDetailView view;
-    List<ShoppingListItem> shoppingListItems;
-    boolean currentlySortedByTimeStamp;
-    ShoppingListItemAdapter shoppingListItemAdapter;
+    private List<ShoppingListItem> shoppingListItems;
+    private boolean currentlySortedByTimeStamp;
+    private ShoppingListItemAdapter shoppingListItemAdapter;
+    private int shoppingListId;
 
-    public ShoppingListPresenter(IDetailView view) {
+    public ShoppingListPresenter(IDetailView view, int shoppingListId) {
         this.view = view;
         shoppingListItems = new ArrayList<ShoppingListItem>();
         shoppingListItemAdapter = new ShoppingListItemAdapter(shoppingListItems);
+        this.shoppingListId = shoppingListId;
     }
 
     @Override
     public void onShoppingListItemClick(int position) {
         final ShoppingListItem item = shoppingListItems.get(position);
         shoppingListItems.remove(item);
-        AppDatabase.getAppDatabase(getApplicationContext()).shoppingListItemDao().deleteItem(item);
+        AppDatabase.getAppDatabase(view.getContext()).shoppingListItemDao().deleteItem(item);
         reloadAdapter();
+        view.loadRestoreSnackbar(item);
+    }
 
-        // Show snackbar to restore entry
-        Snackbar.make(parentLayout, getResources().getString(R.string.snackbar_information), Snackbar.LENGTH_LONG).
-                setAction(getResources().getString(R.string.snackbar_restore), new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        shoppingListItems.add(item);
-                        AppDatabase.getAppDatabase(getApplicationContext()).shoppingListItemDao().insertItem(item);
-                        reloadAdapter();
-                    }
-
-                }).show();
+    @Override
+    public void onRestoreSnackbarClick(ShoppingListItem item) {
+        shoppingListItems.add(item);
+        AppDatabase.getAppDatabase(view.getContext()).shoppingListItemDao().insertItem(item);
+        reloadAdapter();
     }
 
     @Override
@@ -65,7 +57,8 @@ public class ShoppingListPresenter implements IDetailPresenter {
         ShoppingListItem item = new ShoppingListItem();
         item.description = input;
         item.timestampSeconds = (int)(Calendar.getInstance().getTimeInMillis() / 1000);
-        AppDatabase.getAppDatabase(view.getContext()).shoppingListDao().insertList(item);
+        item.listId = shoppingListId;
+        AppDatabase.getAppDatabase(view.getContext()).shoppingListItemDao().insertItem(item);
         shoppingListItems.add(item);
         reloadAdapter();
     }
@@ -83,7 +76,7 @@ public class ShoppingListPresenter implements IDetailPresenter {
     }
 
     private void reloadAdapter() {
-        shoppingListItems = AppDatabase.getAppDatabase(view.getContext()).shoppingListItemDao().getAllForShoppingList();
+        shoppingListItems = AppDatabase.getAppDatabase(view.getContext()).shoppingListItemDao().getAllForShoppingList(shoppingListId);
 
         if(currentlySortedByTimeStamp) {
             Collections.sort(shoppingListItems, new Comparator<ShoppingListItem>() {
@@ -105,5 +98,17 @@ public class ShoppingListPresenter implements IDetailPresenter {
 
         shoppingListItemAdapter.setShoppingListItems(shoppingListItems);
         shoppingListItemAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onPause() {
+        if(shoppingListItems.size() == 0) {
+            AppDatabase.getAppDatabase(view.getContext()).shoppingListDao().deleteListById(shoppingListId);
+        }
+    }
+
+    @Override
+    public void onAddNewItemButtonClick() {
+        view.loadNewEntryDialog();
     }
 }

@@ -44,18 +44,18 @@ public class ShoppingListActivity extends AppCompatActivity implements IDetailVi
         setContentView(R.layout.activity_shopping_list);
         //getSupportActionBar().hide();
 
-        presenter = new ShoppingListPresenter(this);
-
         parentLayout = findViewById(R.id.clShoppingList);
         toolbar = findViewById(R.id.shoppingListToolbar);
+
+        rvShoppingListItems = findViewById(R.id.rvShoppingListItems);
+        rvShoppingListItems.setLayoutManager(new LinearLayoutManager(this));
 
         Intent intent = getIntent();
         shoppingListId = intent.getIntExtra("shoppinglist_id", -1);
         shoppingListDescription = intent.getStringExtra("shoppinglist_description");
         toolbar.setTitle(shoppingListDescription);
 
-        rvShoppingListItems = findViewById(R.id.rvShoppingListItems);
-        rvShoppingListItems.setLayoutManager(new LinearLayoutManager(this));
+        presenter = new ShoppingListPresenter(this, shoppingListId);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -64,7 +64,7 @@ public class ShoppingListActivity extends AppCompatActivity implements IDetailVi
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loadNewEntryDialog();
+                presenter.onAddNewItemButtonClick();
             }
         });
 
@@ -80,17 +80,12 @@ public class ShoppingListActivity extends AppCompatActivity implements IDetailVi
     }
 
     @Override
-    public void loadPreviousActivity(Intent intent) {
-
-    }
-
-    @Override
     public void initAdapter(ShoppingListItemAdapter adapter) {
         rvShoppingListItems.setAdapter(adapter);
         adapter.SetOnItemClickListener(new ShoppingListItemAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
-                removeEntry(position);
+                presenter.onShoppingListItemClick(position);
             }
         });
     }
@@ -124,16 +119,28 @@ public class ShoppingListActivity extends AppCompatActivity implements IDetailVi
         b.show();
     }
 
-    private void removeEntry(int position) {
+    @Override
+    public void loadRestoreSnackbar(final ShoppingListItem item) {
+        Snackbar.make(parentLayout, getResources().getString(R.string.snackbar_information), Snackbar.LENGTH_LONG).
+                setAction(getResources().getString(R.string.snackbar_restore), new View.OnClickListener() {
 
+                    @Override
+                    public void onClick(View v) {
+                        presenter.onRestoreSnackbarClick(item);
+                    }
 
+                }).show();
     }
 
     @Override
     protected void onPause() {
-        if(shoppingListItems.size() == 0) {
-            AppDatabase.getAppDatabase(getApplicationContext()).shoppingListDao().deleteListById(shoppingListId);
-        }
         super.onPause();
+        presenter.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        presenter.onResume();
     }
 }
