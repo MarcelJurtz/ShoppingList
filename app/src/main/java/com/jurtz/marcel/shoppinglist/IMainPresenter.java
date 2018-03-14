@@ -8,5 +8,4 @@ public interface IMainPresenter {
     void onSortButtonClick();
     void onEntryDialogConfirmation(String input);
     void onResume();
-    void onCreate();
 }

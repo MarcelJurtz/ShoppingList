@@ -8,7 +8,6 @@ public interface IDetailPresenter {
     void onSortButtonClick();
     void onEntryDialogConfirmation(String input);
     void onRestoreSnackbarClick(ShoppingListItem item);
-    void onCreate();
     void onPause();
     void onResume();
 }

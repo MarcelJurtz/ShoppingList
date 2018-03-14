@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements IMainView {
             }
         });
 
-        presenter.onCreate();
+        presenter.onResume();
 
     }
 

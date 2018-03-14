@@ -80,7 +80,7 @@ public class ShoppingListActivity extends AppCompatActivity implements IDetailVi
 
         rvShoppingListItems.setAdapter(shoppingListItemAdapter);
 
-        presenter.onCreate();
+        presenter.onResume();
     }
 
 

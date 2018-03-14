@@ -1,8 +1,10 @@
 package com.jurtz.marcel.shoppinglist;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 
 import com.jurtz.marcel.shoppinglist.database.AppDatabase;
+import com.jurtz.marcel.shoppinglist.database.ShoppingListDao;
 import com.jurtz.marcel.shoppinglist.model.ShoppingList;
 import com.jurtz.marcel.shoppinglist.model.ShoppingListAdapter;
 
@@ -19,11 +21,13 @@ public class MainPresenter implements IMainPresenter {
     boolean currentlySortedByTimeStamp;
     ShoppingListAdapter shoppingListAdapter;
 
+    private final ShoppingListDao shoppingListDao;
 
     public MainPresenter(IMainView view) {
         this.view = view;
         shoppingLists = new ArrayList<>();
         shoppingListAdapter = new ShoppingListAdapter(shoppingLists);
+        shoppingListDao = AppDatabase.getAppDatabase(view.getContext()).shoppingListDao();
     }
 
 
@@ -43,7 +47,7 @@ public class MainPresenter implements IMainPresenter {
     @Override
     public void onSortButtonClick() {
         currentlySortedByTimeStamp = !currentlySortedByTimeStamp;
-        reloadAdapter();
+        refreshGui();
     }
 
     @Override
@@ -51,26 +55,17 @@ public class MainPresenter implements IMainPresenter {
         ShoppingList list = new ShoppingList();
         list.description = input;
         list.timestampSeconds = (int)(Calendar.getInstance().getTimeInMillis() / 1000);
-        AppDatabase.getAppDatabase(view.getContext()).shoppingListDao().insertList(list);
-        shoppingLists.add(list);
-        reloadAdapter();
+        list.itemCount = 0;
+
+        new AddListTask(shoppingListDao, list).execute();
     }
 
     @Override
     public void onResume() {
-        reloadAdapter();
-        view.initAdapter(shoppingListAdapter);
+        new GetAllListsTask(shoppingListDao).execute();
     }
 
-    @Override
-    public void onCreate() {
-        reloadAdapter();
-        view.initAdapter(shoppingListAdapter);
-    }
-
-    private void reloadAdapter() {
-        shoppingLists = AppDatabase.getAppDatabase(view.getContext()).shoppingListDao().getAll();
-
+    private void refreshGui() {
         if(currentlySortedByTimeStamp) {
             Collections.sort(shoppingLists, new Comparator<ShoppingList>() {
                 @Override
@@ -89,13 +84,53 @@ public class MainPresenter implements IMainPresenter {
             });
         }
 
-        for(int i = 0; i < shoppingLists.size(); i++) {
-            shoppingLists.get(i).itemCount = AppDatabase.getAppDatabase(view.getContext()).shoppingListItemDao().getItemCountForShoppingList(shoppingLists.get(i).id);
-        }
-
         shoppingListAdapter.setShoppingLists(shoppingLists);
         shoppingListAdapter.notifyDataSetChanged();
+
+        view.initAdapter(shoppingListAdapter);
     }
 
+    public class GetAllListsTask extends AsyncTask<Void, Void, Void> {
 
+        private final ShoppingListDao listDao;
+
+        List<ShoppingList> lists = new ArrayList<ShoppingList>();
+
+        public GetAllListsTask(ShoppingListDao dao) {
+            super();
+            listDao = dao;
+        }
+
+        protected Void doInBackground(Void... params) {
+            lists = listDao.getAll();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            shoppingLists = lists;
+            refreshGui();
+        }
+    }
+
+    public class AddListTask extends AsyncTask<Void, Void, Void> {
+        private final ShoppingListDao listDao;
+        private final ShoppingList list;
+
+        public AddListTask(ShoppingListDao dao, ShoppingList list) {
+            super();
+            listDao = dao;
+            this.list = list;
+        }
+
+        protected Void doInBackground(Void... params) {
+            listDao.insertList(list);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            new GetAllListsTask(shoppingListDao).execute();
+        }
+    }
 }

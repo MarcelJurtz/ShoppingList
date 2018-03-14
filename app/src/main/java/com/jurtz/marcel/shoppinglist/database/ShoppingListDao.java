@@ -19,6 +19,9 @@ public interface ShoppingListDao {
     @Query("DELETE FROM shopping_list WHERE id = :id")
     void deleteListById(int id);
 
+    @Query("UPDATE shopping_list SET item_count = :itemCount WHERE id = :id")
+    void updateListItemCount(int itemCount, int id);
+
     @Insert()
     void insertList(ShoppingList shoppingList);
 
