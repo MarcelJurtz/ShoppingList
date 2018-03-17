@@ -20,8 +20,6 @@ public abstract class AppDatabase extends RoomDatabase {
         if (INSTANCE == null) {
             INSTANCE =
                     Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "shoppinglist-db")
-                            // TODO only run queries on separate threads. See PersistenceBasicSample for an example.
-                            //.allowMainThreadQueries()
                             .build();
         }
         return INSTANCE;
