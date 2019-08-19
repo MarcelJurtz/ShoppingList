@@ -1,4 +1,4 @@
-package com.jurtz.marcel.shoppinglist.model;
+package com.jurtz.marcel.sist.model;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

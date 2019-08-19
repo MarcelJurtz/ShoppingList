@@ -1,13 +1,11 @@
-package com.jurtz.marcel.shoppinglist;
+package com.jurtz.marcel.sist;
 
 import android.os.AsyncTask;
 
-import com.jurtz.marcel.shoppinglist.database.AppDatabase;
-import com.jurtz.marcel.shoppinglist.database.ShoppingListDao;
-import com.jurtz.marcel.shoppinglist.database.ShoppingListItemDao;
-import com.jurtz.marcel.shoppinglist.model.ShoppingList;
-import com.jurtz.marcel.shoppinglist.model.ShoppingListItem;
-import com.jurtz.marcel.shoppinglist.model.ShoppingListItemAdapter;
+import com.jurtz.marcel.sist.contract.IDetailPresenter;
+import com.jurtz.marcel.sist.contract.IDetailView;
+import com.jurtz.marcel.sist.model.*;
+import com.jurtz.marcel.sist.database.*;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,7 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class ShoppingListPresenter implements IDetailPresenter {
+public class DetailPresenter implements IDetailPresenter {
 
     private IDetailView view;
     private List<ShoppingListItem> shoppingListItems;
@@ -25,7 +23,7 @@ public class ShoppingListPresenter implements IDetailPresenter {
     private final ShoppingListItemDao shoppingListItemDao;
     private final ShoppingListDao shoppingListDao;
 
-    public ShoppingListPresenter(IDetailView view, int shoppingListId) {
+    public DetailPresenter(IDetailView view, int shoppingListId) {
         this.view = view;
         shoppingListItems = new ArrayList<ShoppingListItem>();
         shoppingListItemAdapter = new ShoppingListItemAdapter(shoppingListItems);
@@ -41,6 +39,13 @@ public class ShoppingListPresenter implements IDetailPresenter {
 
 
         new DeleteItemTask(shoppingListItemDao, item).execute();
+    }
+
+    @Override
+    public void onDetailItemLongClick(int position) {
+        final ShoppingListItem item = shoppingListItems.get(position);
+
+        //view.loadEntryEditDialog(item);
     }
 
     @Override

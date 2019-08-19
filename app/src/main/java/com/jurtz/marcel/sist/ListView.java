@@ -1,4 +1,4 @@
-package com.jurtz.marcel.shoppinglist;
+package com.jurtz.marcel.sist;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -14,12 +14,17 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import com.jurtz.marcel.shoppinglist.model.ShoppingListAdapter;
 
-public class MainActivity extends AppCompatActivity implements IMainView {
+import com.jurtz.marcel.shoppinglist.R;
+import com.jurtz.marcel.sist.contract.IListPresenter;
+import com.jurtz.marcel.sist.contract.IListView;
+import com.jurtz.marcel.sist.model.ShoppingListAdapter;
+import com.jurtz.marcel.sist.model.ShoppingListItem;
+
+public class ListView extends AppCompatActivity implements IListView {
 
     ImageButton cmdSort;
-    IMainPresenter presenter;
+    IListPresenter presenter;
     RecyclerView rvShoppingLists;
 
     @Override
@@ -28,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements IMainView {
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
 
-        presenter = new MainPresenter(this);
+        presenter = new ListPresenter(this);
 
         rvShoppingLists = findViewById(R.id.rvShoppingLists);
         rvShoppingLists.setLayoutManager(new LinearLayoutManager(this));
@@ -37,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements IMainView {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loadNewEntryDialog();
+                loadNewItemDialog();
             }
         });
 
@@ -45,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements IMainView {
         cmdSort.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onSortButtonClick();
+                presenter.onSortClick();
             }
         });
 
@@ -64,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements IMainView {
         adapter.setOnItemClickListener(new ShoppingListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
-                presenter.onShoppingListClick(position);
+                presenter.onListClick(position);
             }
         });
     }
@@ -75,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements IMainView {
     }
 
     @Override
-    public void loadNewEntryDialog() {
+    public void loadNewItemDialog() {
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
@@ -89,7 +94,36 @@ public class MainActivity extends AppCompatActivity implements IMainView {
         dialogBuilder.setPositiveButton(getResources().getString(R.string.dialog_positive_button), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String input = txtInput.getText().toString().trim();
-                presenter.onEntryDialogConfirmation(input);
+                presenter.onAddDialogConfirm(input);
+            }
+        });
+        dialogBuilder.setNegativeButton(getResources().getString(R.string.dialog_negative_button), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // pass
+            }
+        });
+
+        AlertDialog b = dialogBuilder.create();
+        b.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        b.show();
+    }
+
+    @Override
+    public void loadEditItemDialog(ShoppingListItem item) {
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.input_dialog, null);
+        dialogBuilder.setView(dialogView);
+
+        final EditText txtInput = (EditText) dialogView.findViewById(R.id.txtDialogInput);
+
+        dialogBuilder.setTitle(getResources().getString(R.string.dialog_title));
+        dialogBuilder.setMessage(getResources().getString(R.string.dialog_message));
+        dialogBuilder.setPositiveButton(getResources().getString(R.string.dialog_positive_button), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String input = txtInput.getText().toString().trim();
+                presenter.onAddDialogConfirm(input);
             }
         });
         dialogBuilder.setNegativeButton(getResources().getString(R.string.dialog_negative_button), new DialogInterface.OnClickListener() {

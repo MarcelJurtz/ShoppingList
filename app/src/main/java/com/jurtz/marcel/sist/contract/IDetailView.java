@@ -1,9 +1,8 @@
-package com.jurtz.marcel.shoppinglist;
+package com.jurtz.marcel.sist.contract;
 
 import android.content.Context;
 
-import com.jurtz.marcel.shoppinglist.model.ShoppingListItem;
-import com.jurtz.marcel.shoppinglist.model.ShoppingListItemAdapter;
+import com.jurtz.marcel.sist.model.*;
 
 public interface IDetailView {
     Context getContext();

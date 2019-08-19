@@ -1,4 +1,4 @@
-package com.jurtz.marcel.shoppinglist;
+package com.jurtz.marcel.sist;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -17,17 +17,15 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import com.jurtz.marcel.shoppinglist.database.AppDatabase;
-import com.jurtz.marcel.shoppinglist.model.ShoppingList;
-import com.jurtz.marcel.shoppinglist.model.ShoppingListAdapter;
-import com.jurtz.marcel.shoppinglist.model.ShoppingListItem;
-import com.jurtz.marcel.shoppinglist.model.ShoppingListItemAdapter;
+import com.jurtz.marcel.shoppinglist.R;
+import com.jurtz.marcel.sist.contract.IDetailPresenter;
+import com.jurtz.marcel.sist.contract.IDetailView;
+import com.jurtz.marcel.sist.model.ShoppingListItem;
+import com.jurtz.marcel.sist.model.ShoppingListItemAdapter;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
-public class ShoppingListActivity extends AppCompatActivity implements IDetailView {
+public class DetailView extends AppCompatActivity implements IDetailView {
 
     int shoppingListId;
     String shoppingListDescription;
@@ -57,7 +55,7 @@ public class ShoppingListActivity extends AppCompatActivity implements IDetailVi
         shoppingListDescription = intent.getStringExtra("shoppinglist_description");
         toolbar.setTitle(shoppingListDescription);
 
-        presenter = new ShoppingListPresenter(this, shoppingListId);
+        presenter = new DetailPresenter(this, shoppingListId);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

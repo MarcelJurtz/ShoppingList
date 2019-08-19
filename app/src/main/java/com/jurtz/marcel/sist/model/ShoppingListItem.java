@@ -1,4 +1,4 @@
-package com.jurtz.marcel.shoppinglist.model;
+package com.jurtz.marcel.sist.model;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;

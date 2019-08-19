@@ -1,12 +1,15 @@
-package com.jurtz.marcel.shoppinglist;
+package com.jurtz.marcel.sist;
 
 import android.content.Intent;
 import android.os.AsyncTask;
 
-import com.jurtz.marcel.shoppinglist.database.AppDatabase;
-import com.jurtz.marcel.shoppinglist.database.ShoppingListDao;
-import com.jurtz.marcel.shoppinglist.model.ShoppingList;
-import com.jurtz.marcel.shoppinglist.model.ShoppingListAdapter;
+import com.jurtz.marcel.sist.contract.IListPresenter;
+import com.jurtz.marcel.sist.contract.IListView;
+import com.jurtz.marcel.sist.database.AppDatabase;
+import com.jurtz.marcel.sist.database.ShoppingListDao;
+import com.jurtz.marcel.sist.model.ShoppingList;
+import com.jurtz.marcel.sist.model.ShoppingListAdapter;
+import com.jurtz.marcel.sist.model.ShoppingListItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -14,16 +17,16 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class MainPresenter implements IMainPresenter {
+public class ListPresenter implements IListPresenter {
 
-    private IMainView view;
+    private IListView view;
     List<ShoppingList> shoppingLists;
     boolean currentlySortedByTimeStamp;
     ShoppingListAdapter shoppingListAdapter;
 
     private final ShoppingListDao shoppingListDao;
 
-    public MainPresenter(IMainView view) {
+    public ListPresenter(IListView view) {
         this.view = view;
         shoppingLists = new ArrayList<>();
         shoppingListAdapter = new ShoppingListAdapter(shoppingLists);
@@ -32,32 +35,44 @@ public class MainPresenter implements IMainPresenter {
 
 
     @Override
-    public void onShoppingListClick(int position) {
-        Intent intent = new Intent(view.getContext(), ShoppingListActivity.class);
+    public void onListClick(int position) {
+        Intent intent = new Intent(view.getContext(), DetailView.class);
         intent.putExtra("shoppinglist_id", shoppingLists.get(position).id);
         intent.putExtra("shoppinglist_description", shoppingLists.get(position).description);
         view.loadIntent(intent);
     }
 
+
+
     @Override
-    public void onFloatingActionButtonClick() {
-        view.loadNewEntryDialog();
+    public void onFabClick() {
+        view.loadNewItemDialog();
     }
 
     @Override
-    public void onSortButtonClick() {
+    public void onSortClick() {
         currentlySortedByTimeStamp = !currentlySortedByTimeStamp;
         refreshGui();
     }
 
     @Override
-    public void onEntryDialogConfirmation(String input) {
+    public void onAddDialogConfirm(String input) {
         ShoppingList list = new ShoppingList();
         list.description = input;
         list.timestampSeconds = (int)(Calendar.getInstance().getTimeInMillis() / 1000);
         list.itemCount = 0;
 
         new AddListTask(shoppingListDao, list).execute();
+    }
+
+    @Override
+    public void onEditDialogConfirm(ShoppingListItem item) { // TODO Implementation
+        //ShoppingList list = new ShoppingList();
+        //list.description = input;
+        //list.timestampSeconds = (int)(Calendar.getInstance().getTimeInMillis() / 1000);
+        //list.itemCount = 0;
+
+        //new AddListTask(shoppingListDao, list).execute();
     }
 
     @Override
