@@ -1,9 +1,11 @@
 package com.jurtz.marcel.sist.model;
 
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.jurtz.marcel.shoppinglist.R;
@@ -14,6 +16,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
 
     private List<ShoppingList> shoppingLists;
     OnItemClickListener mItemClickListener;
+    AdapterView.OnItemLongClickListener mItemLongClickListener;
 
     public ShoppingListAdapter(List<ShoppingList> shoppingLists) {
         this.shoppingLists = shoppingLists;
@@ -53,6 +56,11 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
     public void setOnItemClickListener(final OnItemClickListener mItemClickListener) {
         this.mItemClickListener = mItemClickListener;
     }
+
+    public void setOnItemLongClickListener(final AdapterView.OnItemLongClickListener mItemLongClickListener) {
+        this.mItemLongClickListener = mItemLongClickListener;
+    }
+
     public class ShoppingListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView header;
@@ -64,12 +72,36 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
             header = v.findViewById(R.id.lblShoppingListRowItemHeader);
             subHeader = v.findViewById(R.id.lblShoppingListRowItemSubheader);
             v.setOnClickListener(this);
+
+            ((CardView)v).setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+
+
+                    return false; // TODO What to return?
+                }
+            });
         }
 
         @Override
         public void onClick(View v) {
             mItemClickListener.onItemClick(v, getAdapterPosition());
         }
+
+        public void onLongClick(View v) {
+
+            //mItemLongClickListener.onItemLongClick(null, v, getAdapterPosition());
+            getAdapterPosition(); }
+
+       /* @Override
+        public void onItemLongClick(RecyclerView.Adapter<ShoppingListAdapter.ShoppingListViewHolder> adp, View v, int pos, long id) {
+
+        }*/
+
+
+
+
 
         public void bindShoppingList(ShoppingList shoppingList) {
             if(shoppingList != null) {

@@ -8,8 +8,8 @@ import com.jurtz.marcel.sist.model.ShoppingListItem;
 
 public interface IListView {
     Context getContext();
-    void loadNewItemDialog();
-    void loadEditItemDialog(ShoppingListItem item);
+    void loadNewListDialog();
+    void loadEditListDialog(ShoppingListItem item);
     void loadIntent(Intent intent);
     void initAdapter(ShoppingListAdapter adapter);
 }

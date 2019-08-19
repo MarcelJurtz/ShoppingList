@@ -9,7 +9,7 @@ import com.jurtz.marcel.sist.database.AppDatabase;
 import com.jurtz.marcel.sist.database.ShoppingListDao;
 import com.jurtz.marcel.sist.model.ShoppingList;
 import com.jurtz.marcel.sist.model.ShoppingListAdapter;
-import com.jurtz.marcel.sist.model.ShoppingListItem;
+import com.jurtz.marcel.sist.task.*;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -46,13 +46,13 @@ public class ListPresenter implements IListPresenter {
 
     @Override
     public void onFabClick() {
-        view.loadNewItemDialog();
+        view.loadNewListDialog();
     }
 
     @Override
     public void onSortClick() {
         currentlySortedByTimeStamp = !currentlySortedByTimeStamp;
-        refreshGui();
+        refresh(shoppingLists);
     }
 
     @Override
@@ -62,25 +62,34 @@ public class ListPresenter implements IListPresenter {
         list.timestampSeconds = (int)(Calendar.getInstance().getTimeInMillis() / 1000);
         list.itemCount = 0;
 
-        new AddListTask(shoppingListDao, list).execute();
+        new AddListTask(this, shoppingListDao, list).execute();
     }
 
     @Override
-    public void onEditDialogConfirm(ShoppingListItem item) { // TODO Implementation
+    public void onEditDialogConfirm(ShoppingList list, String input) { // TODO Implementation
         //ShoppingList list = new ShoppingList();
         //list.description = input;
         //list.timestampSeconds = (int)(Calendar.getInstance().getTimeInMillis() / 1000);
         //list.itemCount = 0;
 
         //new AddListTask(shoppingListDao, list).execute();
+
+        if(input.isEmpty())
+            return;
+
+        list.description = input;
+        new RenameListTask(this, shoppingListDao, list).execute();
     }
 
     @Override
     public void onResume() {
-        new GetAllListsTask(shoppingListDao).execute();
+        new GetAllListsTask(this, shoppingListDao).execute();
     }
 
-    private void refreshGui() {
+    public void refresh(List<ShoppingList> lists) {
+
+        shoppingLists = lists;
+
         if(currentlySortedByTimeStamp) {
             Collections.sort(shoppingLists, new Comparator<ShoppingList>() {
                 @Override
@@ -103,49 +112,5 @@ public class ListPresenter implements IListPresenter {
         shoppingListAdapter.notifyDataSetChanged();
 
         view.initAdapter(shoppingListAdapter);
-    }
-
-    public class GetAllListsTask extends AsyncTask<Void, Void, Void> {
-
-        private final ShoppingListDao listDao;
-
-        List<ShoppingList> lists = new ArrayList<ShoppingList>();
-
-        public GetAllListsTask(ShoppingListDao dao) {
-            super();
-            listDao = dao;
-        }
-
-        protected Void doInBackground(Void... params) {
-            lists = listDao.getAll();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            shoppingLists = lists;
-            refreshGui();
-        }
-    }
-
-    public class AddListTask extends AsyncTask<Void, Void, Void> {
-        private final ShoppingListDao listDao;
-        private final ShoppingList list;
-
-        public AddListTask(ShoppingListDao dao, ShoppingList list) {
-            super();
-            listDao = dao;
-            this.list = list;
-        }
-
-        protected Void doInBackground(Void... params) {
-            listDao.insertList(list);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            new GetAllListsTask(shoppingListDao).execute();
-        }
     }
 }

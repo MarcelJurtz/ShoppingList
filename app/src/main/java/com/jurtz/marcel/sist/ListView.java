@@ -16,10 +16,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.jurtz.marcel.shoppinglist.R;
-import com.jurtz.marcel.sist.contract.IListPresenter;
-import com.jurtz.marcel.sist.contract.IListView;
-import com.jurtz.marcel.sist.model.ShoppingListAdapter;
-import com.jurtz.marcel.sist.model.ShoppingListItem;
+import com.jurtz.marcel.sist.contract.*;
+import com.jurtz.marcel.sist.model.*;
 
 public class ListView extends AppCompatActivity implements IListView {
 
@@ -42,7 +40,7 @@ public class ListView extends AppCompatActivity implements IListView {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loadNewItemDialog();
+                loadNewListDialog();
             }
         });
 
@@ -80,7 +78,7 @@ public class ListView extends AppCompatActivity implements IListView {
     }
 
     @Override
-    public void loadNewItemDialog() {
+    public void loadNewListDialog() {
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
@@ -109,7 +107,7 @@ public class ListView extends AppCompatActivity implements IListView {
     }
 
     @Override
-    public void loadEditItemDialog(ShoppingListItem item) {
+    public void loadEditListDialog(ShoppingListItem item) {
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
@@ -117,13 +115,15 @@ public class ListView extends AppCompatActivity implements IListView {
         dialogBuilder.setView(dialogView);
 
         final EditText txtInput = (EditText) dialogView.findViewById(R.id.txtDialogInput);
+        txtInput.setText(item.description);
+        txtInput.setTag(item);
 
         dialogBuilder.setTitle(getResources().getString(R.string.dialog_title));
         dialogBuilder.setMessage(getResources().getString(R.string.dialog_message));
         dialogBuilder.setPositiveButton(getResources().getString(R.string.dialog_positive_button), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String input = txtInput.getText().toString().trim();
-                presenter.onAddDialogConfirm(input);
+                presenter.onEditDialogConfirm((ShoppingList)txtInput.getTag(), input);
             }
         });
         dialogBuilder.setNegativeButton(getResources().getString(R.string.dialog_negative_button), new DialogInterface.OnClickListener() {
