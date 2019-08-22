@@ -64,10 +64,17 @@ public class ListView extends AppCompatActivity implements IListView {
     @Override
     public void initAdapter(ShoppingListAdapter adapter) {
         rvShoppingLists.setAdapter(adapter);
-        adapter.setOnItemClickListener(new ShoppingListAdapter.OnItemClickListener() {
+        adapter.setOnItemClickListener(new IOnItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
                 presenter.onListClick(position);
+            }
+        });
+
+        adapter.setOnItemLongClickListener(new IOnItemLongClickListener() {
+            @Override
+            public void OnItemLongClick(View view, int position) {
+                presenter.onListLongClick(position);
             }
         });
     }
@@ -107,19 +114,19 @@ public class ListView extends AppCompatActivity implements IListView {
     }
 
     @Override
-    public void loadEditListDialog(ShoppingListItem item) {
+    public void loadEditListDialog(ShoppingList list) {
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.input_dialog, null);
         dialogBuilder.setView(dialogView);
 
-        final EditText txtInput = (EditText) dialogView.findViewById(R.id.txtDialogInput);
-        txtInput.setText(item.description);
-        txtInput.setTag(item);
+        final EditText txtInput = dialogView.findViewById(R.id.txtDialogInput);
+        txtInput.setText(list.description);
+        txtInput.setTag(list);
 
-        dialogBuilder.setTitle(getResources().getString(R.string.dialog_title));
-        dialogBuilder.setMessage(getResources().getString(R.string.dialog_message));
+        dialogBuilder.setTitle(getResources().getString(R.string.dialog_title_edit));
+        dialogBuilder.setMessage(getResources().getString(R.string.dialog_message_edit));
         dialogBuilder.setPositiveButton(getResources().getString(R.string.dialog_positive_button), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String input = txtInput.getText().toString().trim();

@@ -1,22 +1,22 @@
 package com.jurtz.marcel.sist.model;
 
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.jurtz.marcel.shoppinglist.R;
+import com.jurtz.marcel.sist.contract.IOnItemClickListener;
+import com.jurtz.marcel.sist.contract.IOnItemLongClickListener;
 
 import java.util.List;
 
 public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.ShoppingListViewHolder> {
 
     private List<ShoppingList> shoppingLists;
-    OnItemClickListener mItemClickListener;
-    AdapterView.OnItemLongClickListener mItemLongClickListener;
+    private IOnItemClickListener mItemClickListener;
+    private IOnItemLongClickListener mItemLongClickListener;
 
     public ShoppingListAdapter(List<ShoppingList> shoppingLists) {
         this.shoppingLists = shoppingLists;
@@ -49,19 +49,15 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         }
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(View view, int position);
-    }
-
-    public void setOnItemClickListener(final OnItemClickListener mItemClickListener) {
+    public void setOnItemClickListener(final IOnItemClickListener mItemClickListener) {
         this.mItemClickListener = mItemClickListener;
     }
 
-    public void setOnItemLongClickListener(final AdapterView.OnItemLongClickListener mItemLongClickListener) {
+    public void setOnItemLongClickListener(final IOnItemLongClickListener mItemLongClickListener) {
         this.mItemLongClickListener = mItemLongClickListener;
     }
 
-    public class ShoppingListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ShoppingListViewHolder extends RecyclerView.ViewHolder {
 
         private TextView header;
         private TextView subHeader;
@@ -71,53 +67,34 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
             super(v);
             header = v.findViewById(R.id.lblShoppingListRowItemHeader);
             subHeader = v.findViewById(R.id.lblShoppingListRowItemSubheader);
-            v.setOnClickListener(this);
 
-            ((CardView)v).setOnLongClickListener(new View.OnLongClickListener() {
+            v.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
 
+                    mItemLongClickListener.OnItemLongClick(v, getAdapterPosition());
+                    return true;
+                }
+            });
 
-
-                    return false; // TODO What to return?
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mItemClickListener.onItemClick(v, getAdapterPosition());
                 }
             });
         }
-
-        @Override
-        public void onClick(View v) {
-            mItemClickListener.onItemClick(v, getAdapterPosition());
-        }
-
-        public void onLongClick(View v) {
-
-            //mItemLongClickListener.onItemLongClick(null, v, getAdapterPosition());
-            getAdapterPosition(); }
-
-       /* @Override
-        public void onItemLongClick(RecyclerView.Adapter<ShoppingListAdapter.ShoppingListViewHolder> adp, View v, int pos, long id) {
-
-        }*/
-
-
-
-
 
         public void bindShoppingList(ShoppingList shoppingList) {
             if(shoppingList != null) {
 
                 header.setText(shoppingList.description);
 
-                String suffix = "";
-                int count = shoppingList.itemCount;
+                String suffix = shoppingList.itemCount == 1 ?
+                        header.getContext().getResources().getString(R.string.rv_shopping_list_items_suffix_single) :
+                        header.getContext().getResources().getString(R.string.rv_shopping_list_items_suffix_multiple);
 
-                if (count == 1) {
-                    suffix = header.getContext().getResources().getString(R.string.rv_shopping_list_items_suffix_single);
-                } else {
-                    suffix = header.getContext().getResources().getString(R.string.rv_shopping_list_items_suffix_multiple);
-                }
-
-                subHeader.setText(count + " " + suffix);
+                subHeader.setText(shoppingList.itemCount + " " + suffix);
             }
         }
     }

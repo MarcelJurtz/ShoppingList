@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface IListPresenter {
     void onListClick(int position);
+    void onListLongClick(int position);
     void onFabClick();
     void onSortClick();
     void onAddDialogConfirm(String input);

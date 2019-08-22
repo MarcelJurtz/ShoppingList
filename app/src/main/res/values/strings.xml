@@ -14,7 +14,9 @@
     <string name="dialog_input_label">Description</string>
 
     <string name="dialog_title">New Entry</string>
+    <string name="dialog_title_edit">Edit Entry</string>
     <string name="dialog_message">Add the description for your new item!</string>
+    <string name="dialog_message_edit">Edit the description of an existing item!</string>
     <string name="dialog_positive_button">Save</string>
     <string name="dialog_negative_button">Cancel</string>
 

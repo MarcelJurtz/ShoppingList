@@ -14,7 +14,9 @@
     <string name="dialog_input_label">Beschreibung</string>
 
     <string name="dialog_title">Neuer Eintrag</string>
+    <string name="dialog_title_edit">Eintrag Bearbeiten</string>
     <string name="dialog_message">Gib deinem neuen Eintrag eine Beschreibung!</string>
+    <string name="dialog_message_edit">Bearbeite die Beschreibung deines Eintrags!</string>
     <string name="dialog_positive_button">Speichern</string>
     <string name="dialog_negative_button">Abbrechen</string>
 

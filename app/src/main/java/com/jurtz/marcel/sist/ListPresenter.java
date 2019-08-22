@@ -42,6 +42,10 @@ public class ListPresenter implements IListPresenter {
         view.loadIntent(intent);
     }
 
+    @Override
+    public void onListLongClick(int position) {
+        view.loadEditListDialog(shoppingLists.get(position));
+    }
 
 
     @Override
